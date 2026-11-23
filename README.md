@@ -8,8 +8,8 @@ An end-to-end automation practice project using Playwright Test, page objects, f
 - Reusable Playwright fixtures and API helpers.
 - Excel download, update, upload, and validation.
 - Cucumber feature scenarios and step definitions.
-- Local Playwright execution and an optional Azure Playwright service configuration.
-- GitHub Actions CI on pushes and pull requests to `main` or `master`.
+- Local Playwright execution and Azure Playwright Workspaces configuration.
+- GitHub Actions cloud-browser CI on pushes, same-repository pull requests, and manual dispatches.
 
 ## Requirements
 
@@ -83,7 +83,13 @@ Reports, browser state, and local credential files are excluded from Git.
 
 ## CI
 
-The [GitHub Actions workflow](./.github/workflows/playwright.yml) runs the local Playwright configuration. Add repository Actions secrets named `TEST_USER_EMAIL` and `TEST_USER_PASSWORD` before expecting authenticated tests to pass in CI.
+The [GitHub Actions workflow](./.github/workflows/playwright.yml) runs tests using Azure Playwright Workspaces. Add these repository Actions secrets before running it:
+
+- `AZURE_CREDENTIALS`: the JSON credentials output for the Azure service principal used by the workflow.
+- `PLAYWRIGHT_SERVICE_URL`: the endpoint URL for your Playwright workspace.
+- `TEST_USER_EMAIL` and `TEST_USER_PASSWORD`: credentials for the demo application's test account.
+
+The Azure identity needs Contributor access on the Playwright workspace. If Azure report observability is enabled, it also needs Storage Blob Data Contributor on the linked storage account. The workflow is configured to run a cloud test job on pushes, manual dispatches, and same-repository pull requests. Azure Playwright usage may incur charges.
 
 Jenkins execution and scheduled runs are not configured in this repository yet.
 

@@ -55,6 +55,38 @@ az login
 
 If you are already signed in to the correct Azure account and subscription, you do not need to sign in again for every test run.
 
+## GitHub Actions service-principal setup
+
+The GitHub Actions workflow signs in to Azure with `azure/login@v2` and a service-principal JSON credential. Create the service principal with access scoped to the Playwright workspace, rather than the whole resource group:
+
+```powershell
+az ad sp create-for-rbac `
+  --name "github-playwright" `
+  --role "Contributor" `
+  --scopes "<playwright-workspace-resource-id>" `
+  --json-auth
+```
+
+The command prints a JSON credential containing a client secret. Store the complete JSON as the GitHub repository Actions secret `AZURE_CREDENTIALS`. Do not commit it, paste it into chat, or print it in workflow logs.
+
+Set these additional repository Actions secrets:
+
+- `PLAYWRIGHT_SERVICE_URL`: the endpoint for the workspace.
+- `TEST_USER_EMAIL` and `TEST_USER_PASSWORD`: credentials for the test account.
+
+For report artifacts, also grant the service principal **Storage Blob Data Contributor** on the linked storage account. This is separate from the workspace Contributor role.
+
+An Azure role administrator can assign that storage role with:
+
+```powershell
+az role assignment create `
+  --assignee "<clientId-from-the-JSON>" `
+  --role "Storage Blob Data Contributor" `
+  --scope "<linked-storage-account-resource-id>"
+```
+
+Creating the service principal and assigning roles requires the appropriate Entra ID and Azure RBAC permissions. If the command reports insufficient privileges, ask the subscription or resource administrator to create the identity and assignments.
+
 ## Test account credentials
 
 The UI/API test fixtures require these environment variables:

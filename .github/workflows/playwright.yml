@@ -1,27 +1,39 @@
-name: Playwright Tests
+name: Playwright Tests (Azure)
 on:
   push:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+  workflow_dispatch:
+permissions:
+  contents: read
 jobs:
   test:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     timeout-minutes: 60
     runs-on: ubuntu-latest
     env:
       TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
       TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+      PLAYWRIGHT_SERVICE_URL: ${{ secrets.PLAYWRIGHT_SERVICE_URL }}
     steps:
     - uses: actions/checkout@v4
+    - name: Sign in to Azure
+      uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
     - name: Install dependencies
       run: npm ci
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
-    - name: Run Playwright tests
-      run: npx playwright test
+    - name: Validate required configuration
+      run: |
+        test -n "$TEST_USER_EMAIL" || { echo "::error::TEST_USER_EMAIL secret is missing"; exit 1; }
+        test -n "$TEST_USER_PASSWORD" || { echo "::error::TEST_USER_PASSWORD secret is missing"; exit 1; }
+        test -n "$PLAYWRIGHT_SERVICE_URL" || { echo "::error::PLAYWRIGHT_SERVICE_URL secret is missing"; exit 1; }
+    - name: Run Playwright tests in Azure
+      run: npx playwright test --config=playwright.service.config.js
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
