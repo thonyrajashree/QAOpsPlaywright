@@ -1,0 +1,20 @@
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+
+# Local credentials and browser state
+.env
+.env.*
+!.env.example
+/state.json
+/tests/utils/placeorderTestdata.json
+
+# Generated test reports and artifacts
+/allure-results/
+/allure-report/
+/reports/

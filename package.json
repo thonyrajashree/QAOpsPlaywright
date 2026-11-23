@@ -1,0 +1,35 @@
+{
+  "name": "playwrightpractice",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx playwright test",
+    "cucumber": "cucumber-js tests/features/*.feature --require tests/features/support/*.js --format html:reports/cucumber-report.html --format json:reports/cucumber-report.json --format rerun:reports/failed-scenarios.txt --parallel 2",
+    "cucumber:ecommerce": "cucumber-js tests/features/Ecommerce.feature --tags @ecommerce --require tests/features/support/*.js --format html:reports/cucumber-report.html --format json:reports/cucumber-report.json --format rerun:reports/failed-scenarios.txt --parallel 2",
+    "cucumber:login": "cucumber-js tests/features/ErrorValidation.feature --tags @loginValidation --require tests/features/support/*.js --format html:reports/cucumber-report.html --format json:reports/cucumber-report.json --format rerun:reports/failed-scenarios.txt --parallel 2",
+    "cucumber:regression": "cucumber-js tests/features/*.feature --tags @Regression --require tests/features/support/*.js --format html:reports/cucumber-regression-report.html --format json:reports/cucumber-regression-report.json --format rerun:reports/failed-regression-scenarios.txt --retry 1 --parallel 2 --exit",
+    "cucumber:rerun": "node tests/scripts/rerun-failed.js",
+    "test:all": "npm test && npm run cucumber",
+    "webTests": "npx playwright test --grep @web",
+    "APITests": "npx playwright test --grep @API",
+    "report": "npx playwright show-report",
+    "regression": "npx playwright test --grep @Regression"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@azure/identity": "^4.14.1",
+    "@azure/playwright": "^1.1.6",
+    "@cucumber/cucumber": "^13.3.0",
+    "@playwright/test": "^1.60.0",
+    "@types/node": "^25.7.0",
+    "allure-commandline": "^2.46.1",
+    "allure-playwright": "^3.14.0"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0"
+  }
+}
