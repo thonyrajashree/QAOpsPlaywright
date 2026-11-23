@@ -29,16 +29,16 @@ The service config's reporter list replaces the base reporter list for service r
 
 ## Workspace URL and PowerShell
 
-The service needs `PLAYWRIGHT_SERVICE_URL` to identify the Playwright workspace. The URL used for this setup was:
+The service needs `PLAYWRIGHT_SERVICE_URL` to identify the Playwright workspace. Copy the endpoint for your own workspace from its **Get Started** page. Its shape is:
 
 ```text
-wss://eastus.api.playwright.microsoft.com/playwrightworkspaces/9b7cd54c-4a4f-4098-865a-b0d419a78a7a/browsers
+wss://<region>.api.playwright.microsoft.com/playwrightworkspaces/<workspace-id>/browsers
 ```
 
 In the VS Code **PowerShell** terminal, set it like this:
 
 ```powershell
-$env:PLAYWRIGHT_SERVICE_URL="wss://eastus.api.playwright.microsoft.com/playwrightworkspaces/9b7cd54c-4a4f-4098-865a-b0d419a78a7a/browsers"
+$env:PLAYWRIGHT_SERVICE_URL="wss://<region>.api.playwright.microsoft.com/playwrightworkspaces/<workspace-id>/browsers"
 ```
 
 The variable applies only to that terminal session. Set it again in each new terminal. If the workspace changes, replace the URL with the endpoint for the correct workspace.
@@ -75,20 +75,20 @@ Do not commit these values or put them in a checked-in `.env` file. The `.gitign
 
 Azure Workspaces observability stores reports and artifacts in an Azure Storage account.
 
-The storage account visible in this setup is:
+Use the storage account configured for your workspace:
 
-- **Storage account:** `pwstrgrrdfa6d`
-- **Resource group:** `RRD`
+- **Storage account:** `<storage-account>`
+- **Resource group:** `<resource-group>`
 
 To link it to the Playwright workspace:
 
 1. In the Azure portal, open **Azure App Testing** and select the Playwright workspace used by the test URL.
 2. Go to **Settings → Capabilities**.
 3. Enable **Observability**.
-4. Select `pwstrgrrdfa6d` as the storage account and select **Save**.
+4. Select the intended storage account and select **Save**.
 5. On the linked storage account, open **Access control (IAM)** and ensure each person running tests has **Storage Blob Data Contributor**.
 
-A **Storage Blob Data Contributor** role assignment was created for the user on `pwstrgrrdfa6d` at the storage-account scope. That role assignment does not itself link the account to the workspace or create a missing report container. Azure manages the report container; do not create an arbitrary container manually.
+A **Storage Blob Data Contributor** role assignment is needed for each test-running identity on the linked storage account. A role assignment does not itself link the account to the workspace or create a missing report container. Azure manages the report container; do not create an arbitrary container manually.
 
 Microsoft notes that observability storage currently needs public-endpoint network access; private-endpoint-only storage accounts are not supported for artifact storage.
 

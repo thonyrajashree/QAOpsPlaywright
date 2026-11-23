@@ -48,14 +48,7 @@ function readExcelFile(worksheet, searchText) {
     return output;
 }
 
- /*WriteExcelFile(
-    'Apple', 
-    60000,
-    { rowChange: 0, colChange: 2 },
-    'C:\\Users\\91773\\Downloads\\excelDownloadTest.xlsx' 
-); */
-
-test('upload download excel validation', async ({ page }) => {
+test('upload download excel validation', async ({ page }, testInfo) => {
 
   const textsearch  = 'Mango';
   const updateValue = '60000';  // ← add this as string for text comparison
@@ -72,7 +65,7 @@ test('upload download excel validation', async ({ page }) => {
   const download = await downloadPromise;
 
   // 4. Save downloaded file
-  const filePath = 'C:\\Users\\91773\\Downloads\\download.xlsx';
+  const filePath = testInfo.outputPath('download.xlsx');
   await download.saveAs(filePath);
   console.log('File saved:', filePath);
 
