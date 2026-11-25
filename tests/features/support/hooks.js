@@ -7,7 +7,7 @@ const path = require('path');
 setDefaultTimeout(30_000);
 
 Before(async function () {
-  const browser = await chromium.launch({ headless: false });
+  const browser = await chromium.launch({ headless: process.env.CI === 'true' });
   const context = await browser.newContext();
   const page = await context.newPage();
 

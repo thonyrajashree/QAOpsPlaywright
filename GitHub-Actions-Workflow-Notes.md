@@ -4,11 +4,13 @@ This note explains `.github/workflows/playwright.yml` (**Playwright Tests (Azure
 
 ## When it runs
 
-The workflow is named **Playwright Tests** and runs when:
+The workflow is named **Playwright Tests (Azure)** and runs when:
 
 - Code is pushed to the `main` or `master` branch.
 - A pull request targets `main` or `master`.
 - A user manually starts the workflow with **workflow_dispatch**.
+
+When starting it manually, the optional **test_file** input can target one Playwright spec, for example `tests/excelTest.spec.js` or `tests/end-to-endPO.spec.js`. Leave it blank to run all Playwright specs. Cucumber scenarios always run as well. The workflow checks that the supplied Playwright file exists. Push and pull-request runs run the full suite.
 
 GitHub starts a fresh `ubuntu-latest` machine for each run. The job has a 60-minute timeout. The job is skipped for pull requests from forks because GitHub does not provide repository secrets to forked workflows.
 
@@ -19,8 +21,10 @@ GitHub starts a fresh `ubuntu-latest` machine for each run. The job has a 60-min
 3. **Set up Node.js LTS** with `actions/setup-node`.
 4. **Install dependencies** with `npm ci`. This uses `package-lock.json` to install the locked package versions.
 5. **Validate required settings** so missing test credentials or a workspace URL fail with a clear message.
-6. **Run tests with Azure cloud browsers** using `npx playwright test --config=playwright.service.config.js`.
-7. **Upload the local HTML report** from `playwright-report/` as an Actions artifact named `playwright-report`. The artifact is retained for 30 days. It is uploaded after a failed test too, unless the run was cancelled.
+6. **Install Chromium** for Cucumber's local browser tests.
+7. **Run Playwright specs with Azure cloud browsers** using `npx playwright test --config=playwright.service.config.js`.
+8. **Run all Cucumber scenarios** using `npm run cucumber` with headless Chromium on the GitHub runner.
+9. **Upload reports** from `playwright-report/` and `reports/` as the `test-reports` Actions artifact. It is retained for 30 days and uploaded after a failed test too, unless the run was cancelled.
 
 ## Test credentials
 
@@ -35,11 +39,10 @@ Create them under **Repository Settings → Secrets and variables → Actions**.
 
 ## What this workflow runs
 
-The workflow uses `playwright.service.config.js`; the test runner runs on GitHub's Ubuntu machine, while the browser sessions run in Azure Playwright Workspaces. The HTML report is also uploaded as a GitHub Actions artifact.
+The Playwright test runner runs on GitHub's Ubuntu machine, while its browser sessions run in Azure Playwright Workspaces. Cucumber uses Chromium installed on the GitHub runner; its HTML and JSON reports are included in the `test-reports` artifact. The Cucumber report is not uploaded to the Azure Playwright portal.
 
-This workflow does **not** currently:
+This workflow does **not**:
 
-- Run Cucumber scenarios.
 - Use Jenkins or schedule timed builds.
 
 Azure Playwright usage may incur test-minute charges. Jenkins and timed schedules can be added separately when required.

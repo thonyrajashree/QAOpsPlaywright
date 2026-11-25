@@ -5,6 +5,11 @@ on:
   pull_request:
     branches: [ main, master ]
   workflow_dispatch:
+    inputs:
+      test_file:
+        description: "Optional Playwright test file path. Leave blank to run all Playwright tests; Cucumber always runs."
+        required: false
+        type: string
 permissions:
   contents: read
 jobs:
@@ -32,11 +37,29 @@ jobs:
         test -n "$TEST_USER_EMAIL" || { echo "::error::TEST_USER_EMAIL secret is missing"; exit 1; }
         test -n "$TEST_USER_PASSWORD" || { echo "::error::TEST_USER_PASSWORD secret is missing"; exit 1; }
         test -n "$PLAYWRIGHT_SERVICE_URL" || { echo "::error::PLAYWRIGHT_SERVICE_URL secret is missing"; exit 1; }
+    - name: Install Chromium for Cucumber
+      run: npx playwright install --with-deps chromium
     - name: Run Playwright tests in Azure
-      run: npx playwright test --config=playwright.service.config.js
+      env:
+        TEST_FILE: ${{ inputs.test_file }}
+      run: |
+        if [ -n "$TEST_FILE" ]; then
+          if [ ! -f "$TEST_FILE" ]; then
+            echo "::error::Test file not found: $TEST_FILE"
+            exit 1
+          fi
+          npx playwright test --config=playwright.service.config.js "$TEST_FILE"
+        else
+          npx playwright test --config=playwright.service.config.js
+        fi
+    - name: Run Cucumber scenarios
+      run: npm run cucumber
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
-        name: playwright-report
-        path: playwright-report/
+        name: test-reports
+        path: |
+          playwright-report/
+          reports/
+        if-no-files-found: warn
         retention-days: 30
