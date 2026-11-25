@@ -37,8 +37,6 @@ jobs:
         test -n "$TEST_USER_EMAIL" || { echo "::error::TEST_USER_EMAIL secret is missing"; exit 1; }
         test -n "$TEST_USER_PASSWORD" || { echo "::error::TEST_USER_PASSWORD secret is missing"; exit 1; }
         test -n "$PLAYWRIGHT_SERVICE_URL" || { echo "::error::PLAYWRIGHT_SERVICE_URL secret is missing"; exit 1; }
-    - name: Install Chromium for Cucumber
-      run: npx playwright install --with-deps chromium
     - name: Run Playwright tests in Azure
       env:
         TEST_FILE: ${{ inputs.test_file }}

@@ -21,10 +21,9 @@ GitHub starts a fresh `ubuntu-latest` machine for each run. The job has a 60-min
 3. **Set up Node.js LTS** with `actions/setup-node`.
 4. **Install dependencies** with `npm ci`. This uses `package-lock.json` to install the locked package versions.
 5. **Validate required settings** so missing test credentials or a workspace URL fail with a clear message.
-6. **Install Chromium** for Cucumber's local browser tests.
-7. **Run Playwright specs with Azure cloud browsers** using `npx playwright test --config=playwright.service.config.js`.
-8. **Run all Cucumber scenarios** using `npm run cucumber` with headless Chromium on the GitHub runner.
-9. **Upload reports** from `playwright-report/` and `reports/` as the `test-reports` Actions artifact. It is retained for 30 days and uploaded after a failed test too, unless the run was cancelled.
+6. **Run Playwright specs with Azure cloud browsers** using `npx playwright test --config=playwright.service.config.js`.
+7. **Run all Cucumber scenarios** using `npm run cucumber`; the Cucumber hooks connect to Azure-hosted browsers using the workspace URL and Azure credentials.
+8. **Upload reports** from `playwright-report/` and `reports/` as the `test-reports` Actions artifact. It is retained for 30 days and uploaded after a failed test too, unless the run was cancelled.
 
 ## Test credentials
 
@@ -39,7 +38,7 @@ Create them under **Repository Settings → Secrets and variables → Actions**.
 
 ## What this workflow runs
 
-The Playwright test runner runs on GitHub's Ubuntu machine, while its browser sessions run in Azure Playwright Workspaces. Cucumber uses Chromium installed on the GitHub runner; its HTML and JSON reports are included in the `test-reports` artifact. The Cucumber report is not uploaded to the Azure Playwright portal.
+Both Playwright and Cucumber browser sessions run in Azure Playwright Workspaces in CI. Cucumber's HTML and JSON reports are included in the `test-reports` artifact; they are not uploaded to the Azure Playwright portal.
 
 This workflow does **not**:
 

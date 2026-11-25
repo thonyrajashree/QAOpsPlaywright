@@ -1,5 +1,7 @@
 const { Before, After, BeforeStep, AfterStep, setDefaultTimeout } = require('@cucumber/cucumber');
 const { chromium } = require('playwright');
+const { getConnectOptions, ServiceOS } = require('@azure/playwright');
+const { DefaultAzureCredential } = require('@azure/identity');
 const { POManager } = require('../../PageObject/POManager');
 const fs = require('fs');
 const path = require('path');
@@ -7,7 +9,20 @@ const path = require('path');
 setDefaultTimeout(30_000);
 
 Before(async function () {
-  const browser = await chromium.launch({ headless: process.env.CI === 'true' });
+  let browser;
+  if (process.env.PLAYWRIGHT_SERVICE_URL) {
+    const { wsEndpoint, options } = await getConnectOptions({
+      credential: new DefaultAzureCredential(),
+      os: ServiceOS.LINUX,
+      exposeNetwork: '<loopback>',
+      connectTimeout: 3 * 60 * 1000,
+      sourceType: 'Others',
+    });
+    browser = await chromium.connect(wsEndpoint, options);
+  } else {
+    browser = await chromium.launch({ headless: process.env.CI === 'true' });
+  }
+
   const context = await browser.newContext();
   const page = await context.newPage();
 
