@@ -63,6 +63,7 @@ test('upload download excel validation', async ({ page }, testInfo) => {
 
   // 3. Get downloaded file
   const download = await downloadPromise;
+  expect(download.suggestedFilename()).toMatch(/\.xlsx$/);
 
   // 4. Save downloaded file
   const filePath = testInfo.outputPath('download.xlsx');
